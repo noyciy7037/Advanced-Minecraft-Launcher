@@ -87,7 +87,8 @@ public class Main extends JFrame {
 		        //ProcessBuilder p = new ProcessBuilder("sh", "-c", "echo 'Hello!'");
 		          // Windowsの場合はこちら
 				//Launch.bat [MINECRAFT_ID]
-				String JAVA_OPTIONS="-server -splash:splash.png -d64 -da -dsa -Xrs -Xms1G -Xmx1G -XX:NewSize=768M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -XX:+DisableExplicitGC -Djava.library.path=bin\\12345 -cp " + CpfromJson.cp(ver, "C:\\Users\\琉球サクセス\\AppData\\Roaming\\.minecraft")+";"+"versions/"+ver+"/"+ver+".jar" + "  net.minecraft.client.main.Main";
+				String libuuid = LibfromJson.Lib(ver, "C:/Users/琉球サクセス/AppData/Roaming/.minecraft", "windows");
+				String JAVA_OPTIONS="-server -splash:splash.png -d64 -da -dsa -Xrs -Xms1G -Xmx1G -XX:NewSize=768M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -XX:+DisableExplicitGC -Djava.library.path=bin/"+libuuid+" -cp " + CpfromJson.cp(ver, "C:\\Users\\琉球サクセス\\AppData\\Roaming\\.minecraft")+";"+"versions/"+ver+"/"+ver+".jar" + "  net.minecraft.client.main.Main";
 		        String[] JAVA_OPTIONS_ARRAY = JAVA_OPTIONS.split(" ");
 				//JAVA %JAVA_OPTIONS% --username %1 --version 1.7.10-Forge10.13.4.1614 --gameDir C:\minecraft\lantest --assetsDir assets --assetIndex 1.7 --uuid 899329f1a4574427aa9cab86ee8a7416 --accessToken dcc606b989b14e93b022783796066ac6 --userProperties {} --userType mojang --tweakClass cpw.mods.fml.common.launcher.FMLTweaker --nativeLauncherVersion 307
 				List<String> ol = new ArrayList<String>();
@@ -105,7 +106,7 @@ public class Main extends JFrame {
 				ol.add("--assetsDir");
 				ol.add("assets");
 				ol.add("--assetIndex");
-				ol.add("1.7.10");
+				ol.add(ver.substring(0, ver.lastIndexOf(".")));
 				ol.add("--uuid");
 				ol.add("899329f1a4574427aa9cab86ee8a7416");
 				ol.add("--accessToken");

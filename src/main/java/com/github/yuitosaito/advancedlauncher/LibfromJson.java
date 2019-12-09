@@ -8,32 +8,36 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class LibfromJson {
-	public static void main(String[] args) {
-		String[] sa = lib("1.7.10","C:\\Users\\琉球サクセス\\AppData\\Roaming\\.minecraft");
+	public static String Lib(String version,String minecraftDir,String osid) {
+		String[] sa = libdata(version,minecraftDir,osid);
+		UUID uuid = UUID.randomUUID();
+		System.out.println(minecraftDir + "/bin/"+uuid.toString());
 		for(int i = 0;i<sa.length;++i) {
-			System.out.println(sa[i]);
-			ZipUnCompressUtils.unzip("C:\\Users\\琉球サクセス\\AppData\\Roaming\\.minecraft\\" + sa[i], "C:\\Users\\琉球サクセス\\Downloads\\test");
-			String name = new File("C:\\Users\\琉球サクセス\\AppData\\Roaming\\.minecraft\\" + sa[i]).getName().replace(".jar", "");
-			File[] fa = new File("C:\\Users\\琉球サクセス\\Downloads\\test\\"+name).listFiles();
+			ZipUnCompressUtils.unzip(minecraftDir + "/" + sa[i], minecraftDir + "/bin");
+			String name = new File(minecraftDir + "/" + sa[i]).getName().replace(".jar", "");
+			File[] fa = new File(minecraftDir + "/bin/"+name).listFiles();
 			for(int i1 = 0;i1<fa.length;++i1) {
-				if(fa[i1].getName().contains(".dll"))
+				if(fa[i1].getName().contains(".dll") || fa[i1].getName().contains(".so") || fa[i1].getName().contains(".dylib") || fa[i1].getName().contains(".jnilib"))
 					try {
-						Files.copy(Paths.get(fa[i1].getAbsolutePath()), Paths.get("C:\\Users\\琉球サクセス\\Downloads\\test\\dll\\"+fa[i1].getName()));
+						new File(minecraftDir + "/bin/"+uuid.toString()).mkdirs();
+						Files.copy(Paths.get(fa[i1].getAbsolutePath()), Paths.get(minecraftDir + "/bin/"+uuid.toString()+"/"+fa[i1].getName()));
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 			}
 
-			DeleteFile.DelFile(new File("C:\\Users\\琉球サクセス\\Downloads\\test\\"+name));
+			DeleteFile.DelFile(new File(minecraftDir + "/bin/" + name));
 		}
+		return uuid.toString();
 	}
 
-	public static String[] lib(String versionid,String minecraftdir) {
+	public static String[] libdata(String versionid,String minecraftdir,String osid/*windows or osx or linux*/) {
 		// ファイルのパスを指定する
 		File json = new File(minecraftdir + "/versions/"+versionid+"/"+versionid+".json");
 		String jsonstr = "";
@@ -65,7 +69,7 @@ public class LibfromJson {
         List<String> sl = new ArrayList<String>();
         for(int i = 0;i<ja.length();++i) {
         	if(ja.getJSONObject(i).has("natives")){
-        		String os = ja.getJSONObject(i).getJSONObject("natives").getString("windows");//windows or osx or linux
+        		String os = ja.getJSONObject(i).getJSONObject("natives").getString(osid);
         		if(os != null) {
         			String s = ja.getJSONObject(i).getString("name");
         			String sr = ja.getJSONObject(i).getString("name");
