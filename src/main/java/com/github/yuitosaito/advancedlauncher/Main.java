@@ -19,7 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.github.yuitosaito.advancedlauncher.profiles.LoadProfile;
-import com.google.common.io.Files;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Main extends JFrame {
 
@@ -128,7 +130,7 @@ public class Main extends JFrame {
 				if(CpfromJson.assetindex(ver, MinecraftDir).contains("1.7")) {
 				    if(new File(MinecraftDir + "/assets/indexes/" + CpfromJson.assetindex(ver, MinecraftDir) + ".json").exists() && !new File(MinecraftDir + "/assets/indexes/1.7.json").exists()) {
 				        try {
-	                        Files.copy(new File(MinecraftDir + "/assets/indexes/" + CpfromJson.assetindex(ver, MinecraftDir) + ".json"), new File(MinecraftDir + "/assets/indexes/1.7.json"));
+	                        Files.copy(Paths.get(MinecraftDir + "/assets/indexes/" + CpfromJson.assetindex(ver, MinecraftDir) + ".json"), Paths.get(MinecraftDir + "/assets/indexes/1.7.json"));
 	                    } catch (IOException e1) {
 	                        e1.printStackTrace();
 	                    }
