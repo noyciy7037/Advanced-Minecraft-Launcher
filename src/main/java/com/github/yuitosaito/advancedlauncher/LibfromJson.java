@@ -65,6 +65,9 @@ public class LibfromJson {
             e.printStackTrace();
         }
         JSONObject jo = new JSONObject(jsonstr);
+        if(!jo.isNull("jar")) {
+            return libdata(jo.getString("jar"),minecraftdir,osid);
+        }
         JSONArray ja = jo.getJSONArray("libraries");
         List<String> sl = new ArrayList<String>();
         for(int i = 0;i<ja.length();++i) {
