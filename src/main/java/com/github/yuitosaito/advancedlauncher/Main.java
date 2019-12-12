@@ -96,7 +96,7 @@ public class Main extends JFrame {
 				//Launch.bat [MINECRAFT_ID]
 				String jarname = CpfromJson.jarname(ver, MinecraftDir);
 				String libuuid = LibfromJson.Lib(ver, MinecraftDir, "windows");
-				String JAVA_OPTIONS="-server -splash:splash.png -d64 -da -dsa -Xrs -Xms1G -Xmx1G -XX:NewSize=768M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -XX:+DisableExplicitGC -Djava.library.path=bin/"+libuuid+" -cp " + CpfromJson.cp(ver, MinecraftDir)+";"+"versions/"+jarname+"/"+jarname+".jar" + "  "+CpfromJson.mainClass(ver, MinecraftDir);
+				String JAVA_OPTIONS="-server -splash:splash.png -d64 -da -dsa -Xrs -Xms3G -Xmx3G -XX:NewSize=768M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -XX:+DisableExplicitGC -Djava.library.path=bin/"+libuuid+" -cp " + CpfromJson.cp(ver, MinecraftDir)+";"+"versions/"+jarname+"/"+jarname+".jar" + "  "+CpfromJson.mainClass(ver, MinecraftDir);
 		        String[] JAVA_OPTIONS_ARRAY = JAVA_OPTIONS.split(" ");
 				//JAVA %JAVA_OPTIONS% --username %1 --version 1.7.10-Forge10.13.4.1614 --gameDir C:\minecraft\lantest --assetsDir assets --assetIndex 1.7 --uuid 899329f1a4574427aa9cab86ee8a7416 --accessToken dcc606b989b14e93b022783796066ac6 --userProperties {} --userType mojang --tweakClass cpw.mods.fml.common.launcher.FMLTweaker --nativeLauncherVersion 307
 				List<String> ol = new ArrayList<String>();
@@ -110,7 +110,7 @@ public class Main extends JFrame {
 				ol.add("--version");
 				ol.add(ver);
 				ol.add("--gameDir");
-				ol.add("C:\\minecraft\\lantest");
+				ol.add("C:\\minecraft\\boueibu-maruchi");
 				ol.add("--assetsDir");
 				ol.add("assets");
 				ol.add("--assetIndex");
@@ -118,7 +118,7 @@ public class Main extends JFrame {
 				ol.add("--uuid");
 				ol.add("899329f1a4574427aa9cab86ee8a7416");
 				ol.add("--accessToken");
-				ol.add("dcc606b989b14e93b022783796066ac6");
+				ol.add("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZGQxM2RmYWQ2MTc0NDkyOWZlM2I1MWQxMTE5ODNjZiIsIm5iZiI6MTU3NjA1OTQ4MiwieWdndCI6IjY5ZmYwNjRjMzE4ZDRjZmFiOGQ0NjQ2MGMxYWMxM2MyIiwic3ByIjoiODk5MzI5ZjFhNDU3NDQyN2FhOWNhYjg2ZWU4YTc0MTYiLCJyb2xlcyI6W10sImlzcyI6ImludGVybmFsLWF1dGhlbnRpY2F0aW9uIiwiZXhwIjoxNTc2MjMyMjgyLCJpYXQiOjE1NzYwNTk0ODJ9.33L_3SFpqVIGGsSgLkhHpJC3Mn2GbZqDvu91EGXXgNE");
 				ol.add("--userProperties");
 				ol.add("{}");
 				ol.add("--userType");
@@ -137,9 +137,8 @@ public class Main extends JFrame {
 				    }
 				}
 		        ProcessBuilder p = new ProcessBuilder(ol.toArray(new String[ol.size()]));
-		        p.redirectErrorStream(true);
 		        p.directory(new File(MinecraftDir));
-		        Logout.LogoutStart(p,"bin/"+libuuid);
+		        Logout.LogoutStart(p,libuuid);
 			}
 		});
 		btnPlay.setForeground(new Color(0, 0, 0));

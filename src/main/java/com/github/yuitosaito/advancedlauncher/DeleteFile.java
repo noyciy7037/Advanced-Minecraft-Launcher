@@ -11,7 +11,7 @@ public class DeleteFile{
             if (TestFile.isFile()) {
                 //存在したら削除する
                 if (!TestFile.delete()) {
-                    System.out.println("delete failed:"+TestFile);
+                    //System.out.println("delete failed:"+TestFile);
                 }
             //対象がディレクトリの場合
             } else if(TestFile.isDirectory()) {
@@ -27,7 +27,7 @@ public class DeleteFile{
                 //ディレクトリを削除する
                 if (TestFile.delete()) {
                 }else{
-                    System.out.println("delete failed:"+TestFile);
+                    //System.out.println("delete failed:"+TestFile);
                 }
             }
         } else {
