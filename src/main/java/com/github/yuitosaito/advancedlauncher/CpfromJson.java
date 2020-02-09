@@ -11,32 +11,8 @@ import org.json.JSONObject;
 public class CpfromJson {
 
     public static String cp(String versionid, String minecraftdir) {
-        String JsonData = "";
+        String JsonData = getVersionJson(versionid,minecraftdir);
         String res = "";
-        try {
-            // ファイルのパスを指定する
-            File file = new File(minecraftdir + "/versions/" + versionid + "/" + versionid + ".json");
-
-            // ファイルが存在しない場合に例外が発生するので確認する
-            if (!file.exists()) {
-                System.out.print("No File");
-                return null;
-            }
-
-            // BufferedReaderクラスのreadLineメソッドを使って1行ずつ読み込み表示する
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String data;
-            while ((data = bufferedReader.readLine()) != null) {
-                JsonData = JsonData + data;
-            }
-
-            // 最後にファイルを閉じてリソースを開放する
-            bufferedReader.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         JSONObject jo = new JSONObject(JsonData);
         JSONArray ja = jo.getJSONArray("libraries");
@@ -68,32 +44,8 @@ public class CpfromJson {
     }
 
     public static String assetindex(String versionid, String minecraftdir) {
-        String JsonData = "";
+        String JsonData = getVersionJson(versionid,minecraftdir);
         String res = "";
-        try {
-            // ファイルのパスを指定する
-            File file = new File(minecraftdir + "/versions/" + versionid + "/" + versionid + ".json");
-
-            // ファイルが存在しない場合に例外が発生するので確認する
-            if (!file.exists()) {
-                System.out.print("No File");
-                return null;
-            }
-
-            // BufferedReaderクラスのreadLineメソッドを使って1行ずつ読み込み表示する
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String data;
-            while ((data = bufferedReader.readLine()) != null) {
-                JsonData = JsonData + data;
-            }
-
-            // 最後にファイルを閉じてリソースを開放する
-            bufferedReader.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         JSONObject jo = new JSONObject(JsonData);
         if(!jo.isNull("assetIndex")) {
             jo = jo.getJSONObject("assetIndex");
@@ -105,31 +57,7 @@ public class CpfromJson {
     }
 
     public static String jarname(String versionid, String minecraftdir) {
-        String JsonData = "";
-        try {
-            // ファイルのパスを指定する
-            File file = new File(minecraftdir + "/versions/" + versionid + "/" + versionid + ".json");
-
-            // ファイルが存在しない場合に例外が発生するので確認する
-            if (!file.exists()) {
-                System.out.print("No File");
-                return null;
-            }
-
-            // BufferedReaderクラスのreadLineメソッドを使って1行ずつ読み込み表示する
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String data;
-            while ((data = bufferedReader.readLine()) != null) {
-                JsonData = JsonData + data;
-            }
-
-            // 最後にファイルを閉じてリソースを開放する
-            bufferedReader.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String JsonData = getVersionJson(versionid,minecraftdir);
         JSONObject jo = new JSONObject(JsonData);
         if(!jo.isNull("jar")){
             return jo.getString("jar");
@@ -139,6 +67,25 @@ public class CpfromJson {
     }
 
     public static String mainClass(String versionid, String minecraftdir) {
+        String JsonData = getVersionJson(versionid,minecraftdir);
+        JSONObject jo = new JSONObject(JsonData);
+        return jo.getString("mainClass");
+    }
+
+
+    public static String Arguments(String versionid, String minecraftdir) {
+        String JsonData = getVersionJson(versionid,minecraftdir);
+        String res = "";
+        JSONObject jo = new JSONObject(JsonData);
+        if(!jo.isNull("minecraftArguments")) {
+            res = jo.getString("minecraftArguments");
+        }else {
+            res = jo.getString("minecraftArguments");
+        }
+        return res;
+    }
+
+    public static String getVersionJson(String versionid,String minecraftdir) {
         String JsonData = "";
         try {
             // ファイルのパスを指定する
@@ -164,7 +111,6 @@ public class CpfromJson {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        JSONObject jo = new JSONObject(JsonData);
-        return jo.getString("mainClass");
+        return JsonData;
     }
 }

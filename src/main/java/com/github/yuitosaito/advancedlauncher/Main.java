@@ -6,11 +6,6 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -18,36 +13,66 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import com.github.yuitosaito.advancedlauncher.profiles.LoadProfile;
+import org.json.JSONObject;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.github.yuitosaito.advancedlauncher.mojangauth.Auth;
+import com.github.yuitosaito.advancedlauncher.mojangauth.Login;
+import com.github.yuitosaito.advancedlauncher.profiles.LoadProfile;
 
 public class Main extends JFrame {
 
 	private JPanel contentPane;
 	public static JComboBox<String> comboBox = new JComboBox<String>();
 	public static String  MinecraftDir = "";
-	/**
-	 * Launch the application.
-	 */
+	public static String UserName = "";
+	public static Boolean isAuth = false;
+	public static String AccessToken;
+
 	public static void main(String[] args) {
-	    MinecraftDir = "C:/Users/琉球サクセス/AppData/Roaming/.minecraft";
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Main frame = new Main();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+
+	    MinecraftDir = System.getenv("appdata") + "/.minecraft";
+
+	    isAuth = LoadProfile.isAuth(MinecraftDir);
+
+	    if(!isAuth) {
+	        Login.main(null);
+	    }else {
+	        String LastAccessToken = LoadProfile.getLastAccessToken(MinecraftDir);
+	        String ClientToken = LoadProfile.getClientToken(MinecraftDir);
+	        if(LastAccessToken != null && ClientToken != null) {
+	            String res = Auth.postJson("{\"accessToken\": \"" +
+                        LastAccessToken +
+                        "\",\"clientToken\": \"" +
+                        ClientToken +
+                        "\"}"
+                 , "https://authserver.mojang.com/refresh");
+	            JSONObject jo = new JSONObject(res);
+	            if(jo.isNull("error")) {
+	                System.out.println(res);
+	                LoadProfile.setAccessToken(MinecraftDir, jo.getString("accessToken"));
+	                AccessToken = jo.getString("accessToken");
+	                EventQueue.invokeLater(new Runnable() {
+	                    public void run() {
+	                        try {
+	                            Main frame = new Main();
+	                            frame.setVisible(true);
+	                        } catch (Exception e) {
+	                            e.printStackTrace();
+	                        }
+	                    }
+	                });
+	            }else {
+	                LoadProfile.deleteAuth(MinecraftDir);
+	                Login.main(null);
+	            }
+	        }else {
+	            Login.main(null);
+	        }
+
+	    }
 	}
 
-	/**
-	 * Create the frame.
-	 */
+
 	public Main() {
 		setTitle("Minecraft Launcher");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -88,57 +113,32 @@ public class Main extends JFrame {
 
 				String ver = comboBox.getSelectedItem().toString().substring(comboBox.getSelectedItem().toString().lastIndexOf(" - ")
 						, comboBox.getSelectedItem().toString().length()).replace(" - ", "");
-
+				//https://launchermeta.mojang.com/mc/game/version_manifest.json     verlist
+				//https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml      forge
+				//https://files.minecraftforge.net/maven/net/minecraftforge/forge/さっきのXMLの中身のどれか/forge-さっきのXMLの中身のどれか-installer.jar
 		        // 実行する外部プログラムを指定してProcessBuilderインスタンスを生成する
 		        // Macの場合はこちら
 		        //ProcessBuilder p = new ProcessBuilder("sh", "-c", "echo 'Hello!'");
 		          // Windowsの場合はこちら
 				//Launch.bat [MINECRAFT_ID]
 				String jarname = CpfromJson.jarname(ver, MinecraftDir);
+				String Arguments = CpfromJson.Arguments(ver,MinecraftDir);
 				String libuuid = LibfromJson.Lib(ver, MinecraftDir, "windows");
 				String JAVA_OPTIONS="-server -splash:splash.png -d64 -da -dsa -Xrs -Xms3G -Xmx3G -XX:NewSize=768M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -XX:+DisableExplicitGC -Djava.library.path=bin/"+libuuid+" -cp " + CpfromJson.cp(ver, MinecraftDir)+";"+"versions/"+jarname+"/"+jarname+".jar" + "  "+CpfromJson.mainClass(ver, MinecraftDir);
-		        String[] JAVA_OPTIONS_ARRAY = JAVA_OPTIONS.split(" ");
-				//JAVA %JAVA_OPTIONS% --username %1 --version 1.7.10-Forge10.13.4.1614 --gameDir C:\minecraft\lantest --assetsDir assets --assetIndex 1.7 --uuid 899329f1a4574427aa9cab86ee8a7416 --accessToken dcc606b989b14e93b022783796066ac6 --userProperties {} --userType mojang --tweakClass cpw.mods.fml.common.launcher.FMLTweaker --nativeLauncherVersion 307
-				List<String> ol = new ArrayList<String>();
-				ol.add("java");
-				for(int i = 0;i<JAVA_OPTIONS_ARRAY.length;++i) {
-					ol.add(JAVA_OPTIONS_ARRAY[i]);
-				}
-
-				ol.add("-username");
-				ol.add("yuito_3110");
-				ol.add("--version");
-				ol.add(ver);
-				ol.add("--gameDir");
-				ol.add("C:\\minecraft\\boueibu-maruchi");
-				ol.add("--assetsDir");
-				ol.add("assets");
-				ol.add("--assetIndex");
-				ol.add(CpfromJson.assetindex(ver, MinecraftDir));
-				ol.add("--uuid");
-				ol.add("899329f1a4574427aa9cab86ee8a7416");
-				ol.add("--accessToken");
-				ol.add("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZGQxM2RmYWQ2MTc0NDkyOWZlM2I1MWQxMTE5ODNjZiIsIm5iZiI6MTU3NjA1OTQ4MiwieWdndCI6IjY5ZmYwNjRjMzE4ZDRjZmFiOGQ0NjQ2MGMxYWMxM2MyIiwic3ByIjoiODk5MzI5ZjFhNDU3NDQyN2FhOWNhYjg2ZWU4YTc0MTYiLCJyb2xlcyI6W10sImlzcyI6ImludGVybmFsLWF1dGhlbnRpY2F0aW9uIiwiZXhwIjoxNTc2MjMyMjgyLCJpYXQiOjE1NzYwNTk0ODJ9.33L_3SFpqVIGGsSgLkhHpJC3Mn2GbZqDvu91EGXXgNE");
-				ol.add("--userProperties");
-				ol.add("{}");
-				ol.add("--userType");
-				ol.add("mojang");
-				ol.add("-tweakClass");
-				ol.add("cpw.mods.fml.common.launcher.FMLTweaker");
-				ol.add("--nativeLauncherVersion");
-				ol.add("307");
-				if(CpfromJson.assetindex(ver, MinecraftDir).contains("1.7")) {
-				    if(new File(MinecraftDir + "/assets/indexes/" + CpfromJson.assetindex(ver, MinecraftDir) + ".json").exists() && !new File(MinecraftDir + "/assets/indexes/1.7.json").exists()) {
-				        try {
-	                        Files.copy(Paths.get(MinecraftDir + "/assets/indexes/" + CpfromJson.assetindex(ver, MinecraftDir) + ".json"), Paths.get(MinecraftDir + "/assets/indexes/1.7.json"));
-	                    } catch (IOException e1) {
-	                        e1.printStackTrace();
-	                    }
-				    }
-				}
-		        ProcessBuilder p = new ProcessBuilder(ol.toArray(new String[ol.size()]));
-		        p.directory(new File(MinecraftDir));
-		        Logout.LogoutStart(p,libuuid);
+				String Command = "java "+
+				JAVA_OPTIONS+" "+Arguments
+				.replace("${auth_player_name}", "yuito_3110")
+				.replace("${version_name}", ver)
+				.replace("${game_directory}", "C:\\minecraft\\boueibu-maruchi")
+				.replace("${assets_root}", "assets")
+				.replace("${assets_index_name}", CpfromJson.assetindex(ver, MinecraftDir))
+				.replace("${auth_uuid}", "899329f1a4574427aa9cab86ee8a7416")
+				.replace("${auth_access_token}", AccessToken)
+				.replace("${user_properties}", "{}")
+				.replace("${user_type}", "mojang")
+				;
+				System.out.println(Command);
+		        Logout.LogoutStart(Command,libuuid,MinecraftDir);
 			}
 		});
 		btnPlay.setForeground(new Color(0, 0, 0));
